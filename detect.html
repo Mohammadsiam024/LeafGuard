@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Detection • LeafGuard</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Anime.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+<style>
+/* Background Gradient */
+body {
+  background: linear-gradient(-45deg, #022c22, #065f46, #000000, #052e16);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+/* Particles Canvas */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+/* Navbar links */
+.nav-link {
+  position: relative;
+  transition: transform .25s ease, color .25s ease, text-shadow .25s ease;
+}
+.nav-link:hover {
+  transform: translateY(-1px) scale(1.05);
+  color: #86efac;
+  text-shadow: 0 0 10px rgba(134,239,172,.7);
+}
+.nav-link::after {
+  content:"";
+  position:absolute;
+  left:10%; right:10%; bottom:-4px;
+  height:2px;
+  background:linear-gradient(90deg, rgba(134,239,172,0), rgba(134,239,172,1), rgba(134,239,172,0));
+  transform:scaleX(0);
+  transform-origin:center;
+  transition:transform .25s ease;
+}
+.nav-link:hover::after { transform:scaleX(1); }
+</style>
+</head>
+
+<body class="h-screen text-gray-200 flex flex-col">
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Navbar -->
+<nav class="fixed top-0 left-0 right-0 bg-black/60 backdrop-blur-md z-50 shadow-md">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+    <a href="new.html" class="text-2xl font-bold text-white">LeafGuard 🌿</a>
+    <div class="hidden md:flex items-center gap-6">
+      <a class="nav-link text-gray-200" href="new.html">Home</a>
+      <a class="nav-link text-green-400 font-semibold" href="detect.html">Detection</a>
+      <a class="nav-link text-gray-200" href="#">Statistics</a>
+      <a class="nav-link text-gray-200" href="about.html">About</a>
+      <a class="nav-link text-gray-200" href="contact.html">Contact</a>
+    </div>
+    <button id="menuBtn" class="md:hidden text-gray-200 text-2xl">☰</button>
+  </div>
+  <div id="mobileMenu" class="hidden md:hidden bg-black/90 px-6 pb-3">
+    <div class="flex flex-col gap-3">
+      <a class="nav-link text-gray-200" href="index.html">Home</a>
+      <a class="nav-link text-green-400 font-semibold" href="detect.html">Detection</a>
+      <a class="nav-link text-gray-200" href="#">Statistics</a>
+      <a class="nav-link text-gray-200" href="about.html">About</a>
+      <a class="nav-link text-gray-200" href="contact.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Main content: side-by-side -->
+<main class="flex-1 pt-24 px-6 flex flex-col md:flex-row items-start justify-center gap-6">
+  <!-- Left: Upload -->
+  <div id="upload-card" class="w-full md:w-1/2 bg-neutral-900/90 rounded-2xl p-8 shadow-lg opacity-0">
+    <div id="drop-area" class="flex flex-col items-center justify-center border-2 border-dashed border-green-600/60 rounded-xl p-10 cursor-pointer hover:bg-green-900/10 transition">
+      <input type="file" id="fileInput" accept="image/*" class="hidden"/>
+      <span class="text-5xl">📷</span>
+      <p class="mt-4 text-gray-300">Drag & Drop your leaf image here</p>
+      <p class="text-sm text-gray-500">or click to browse</p>
+    </div>
+
+    <div id="preview" class="hidden mt-6 text-center">
+      <img id="previewImg" src="" alt="Preview" class="mx-auto max-h-64 rounded-lg shadow-md"/>
+      <button id="detectBtn" class="mt-5 px-6 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white font-semibold transition">
+        Detect Disease
+      </button>
+    </div>
+  </div>
+
+  <!-- Right: Result -->
+  <div id="result-card" class="w-full md:w-1/2 bg-neutral-900/90 rounded-2xl p-6 shadow-lg border border-green-800 opacity-0">
+    <h2 class="text-xl font-bold text-green-400 mb-2">Detection Result</h2>
+    <p id="result-text" class="text-gray-300">No detection yet</p>
+
+    <h3>Confidence bar →</h3>
+    <!-- Confidence Bar -->
+    <div id="confidence-container" class="mt-4 w-full bg-gray-700/40 rounded-full h-4 hidden">
+        
+      <div id="confidence-bar" class="h-4 bg-green-500 rounded-full w-0"></div>
+    </div>
+
+    <!-- Expandable Details -->
+    <div id="result-details" class="hidden mt-4 text-left">
+      <p id="disease-description" class="text-gray-400 mb-3"></p>
+      <h3 class="font-semibold text-green-300">Treatment Tips:</h3>
+      <ul id="treatment-list" class="list-disc list-inside text-gray-400 mt-1 space-y-1"></ul>
+    </div>
+
+    <button id="toggle-details" class="hidden mt-4 px-4 py-1 rounded-lg bg-green-700 hover:bg-green-600 text-white text-sm transition">
+      Show Details
+    </button>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-black/70 text-gray-500 text-center py-3 text-xs border-t border-gray-800">
+  &copy; 2025 LeafGuard • Built by Group 4
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  menuBtn.onclick = () => mobileMenu.classList.toggle("hidden");
+
+  // Animate entrance
+  anime({ targets:"#upload-card", opacity:[0,1], translateY:[20,0], duration:900, easing:"easeOutCubic" });
+  anime({ targets:"#result-card", opacity:[0,1], translateY:[20,0], duration:900, delay:200, easing:"easeOutCubic" });
+
+  // File upload
+  const dropArea = document.getElementById("drop-area");
+  const fileInput = document.getElementById("fileInput");
+  const preview = document.getElementById("preview");
+  const previewImg = document.getElementById("previewImg");
+  const detectBtn = document.getElementById("detectBtn");
+  const resultCard = document.getElementById("result-card");
+  const resultText = document.getElementById("result-text");
+  const confidenceContainer = document.getElementById("confidence-container");
+  const confidenceBar = document.getElementById("confidence-bar");
+  const details = document.getElementById("result-details");
+  const toggleBtn = document.getElementById("toggle-details");
+  const diseaseDesc = document.getElementById("disease-description");
+  const treatmentList = document.getElementById("treatment-list");
+
+  dropArea.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", handleFile);
+  dropArea.addEventListener("dragover", e=>{ e.preventDefault(); dropArea.classList.add("bg-green-900/20"); });
+  dropArea.addEventListener("dragleave", ()=>dropArea.classList.remove("bg-green-900/20"));
+  dropArea.addEventListener("drop", e=>{ e.preventDefault(); dropArea.classList.remove("bg-green-900/20"); if(e.dataTransfer.files.length){ fileInput.files = e.dataTransfer.files; handleFile(); } });
+
+  function handleFile(){
+    const file = fileInput.files[0];
+    if(file){
+      const reader = new FileReader();
+      reader.onload = e=>{
+        previewImg.src = e.target.result;
+        preview.classList.remove("hidden");
+      }
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Fake detection with confidence
+  detectBtn.addEventListener("click", () => {
+    resultText.textContent = "Analyzing...";
+    confidenceContainer.classList.remove("hidden");
+    confidenceBar.style.width = "0%";
+    details.classList.add("hidden");
+    toggleBtn.classList.add("hidden");
+
+    setTimeout(()=>{
+      const results = {
+        "Healthy Leaf ✅": {desc:"Healthy leaf, no disease.", tips:["Maintain irrigation","Use balanced fertilizers","Monitor regularly"]},
+        "Bacterial Leaf Blight ⚠️": {desc:"Bacterial infection causing yellowing/wilting.", tips:["Resistant varieties","Avoid over-fertilization","Improve drainage"]},
+        "Brown Spot 🍂": {desc:"Fungal brown lesions reducing yield.", tips:["Fungicides","Balanced nutrients","Avoid prolonged wetness"]},
+        "Leaf Smut 🟤": {desc:"Fungal disease causing black sori.", tips:["Certified seeds","Remove infected plants","Apply fungicides"]}
+      };
+      const keys = Object.keys(results);
+      const disease = keys[Math.floor(Math.random()*keys.length)];
+      const info = results[disease];
+      const confidence = Math.floor(Math.random()*21)+80; // 80-100%
+
+      // Update UI
+      resultText.textContent = disease;
+      diseaseDesc.textContent = info.desc;
+      treatmentList.innerHTML = "";
+      info.tips.forEach(t=>{ const li=document.createElement("li"); li.textContent=t; treatmentList.appendChild(li); });
+
+      // Animate confidence bar
+      confidenceBar.style.width="0%";
+      anime({ targets: confidenceBar, width: confidence+"%", duration:1000, easing:"easeOutQuad" });
+
+      // Show details toggle
+      details.classList.add("hidden");
+      toggleBtn.classList.remove("hidden");
+      toggleBtn.textContent="Show Details";
+      toggleBtn.onclick=()=>{ const hidden=details.classList.contains("hidden"); details.classList.toggle("hidden"); toggleBtn.textContent=hidden?"Hide Details":"Show Details"; }
+    }, 2000);
+  });
+
+  // Particles
+  const bg=document.getElementById("bg-canvas");
+  const g=bg.getContext("2d");
+  function sizeCanvas(){ bg.width=innerWidth; bg.height=innerHeight; }
+  sizeCanvas(); window.addEventListener("resize",sizeCanvas);
+  const particles = Array.from({length:70},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+1,dx:(Math.random()-0.5)*0.6,dy:(Math.random()-0.5)*0.6,a:Math.random()*0.5+0.25}));
+  function draw(){ g.clearRect(0,0,bg.width,bg.height); particles.forEach(p=>{ g.beginPath(); g.fillStyle=`rgba(134,239,172,${p.a})`; g.shadowColor="rgba(134,239,172,.9)"; g.shadowBlur=8; g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill(); p.x+=p.dx; p.y+=p.dy; if(p.x<0||p.x>bg.width)p.dx*=-1; if(p.y<0||p.y>bg.height)p.dy*=-1; }); requestAnimationFrame(draw); }
+  draw();
+});
+</script>
+
+</body>
+</html>

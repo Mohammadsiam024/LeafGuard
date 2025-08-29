@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact - LeafGuard</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Anime.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <style>
+/* Animated gradient background */
+body {
+  background: linear-gradient(-45deg, #022c22, #065f46, #000000, #052e16);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Particle canvas */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Navbar hover effect */
+.nav-link {
+  position: relative;
+  transition: transform .25s ease, color .25s ease, text-shadow .25s ease;
+}
+.nav-link:hover {
+  transform: translateY(-1px) scale(1.06);
+  color: #86efac;
+  text-shadow: 0 0 10px rgba(134,239,172,.8);
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -4px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(134,239,172,0), rgba(134,239,172,1), rgba(134,239,172,0));
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .25s ease;
+}
+.nav-link:hover::after { transform: scaleX(1); }
+  </style>
+</head>
+
+<body class="h-screen overflow-hidden text-gray-200 font-sans flex flex-col">
+  <!-- Animated background particles -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 bg-black/60 backdrop-blur-md z-50 shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+      <a href="new.html" class="text-2xl font-bold tracking-wide text-white" id="logo">LeafGuard 🌿</a>
+      <div class="hidden md:flex items-center gap-6">
+        <a class="nav-link text-gray-200" href="new.html">Home</a>
+        <a class="nav-link text-gray-200" href="detect.html">Detection</a>
+        <a class="nav-link text-gray-200" href="">Statistics</a>
+        <a class="nav-link text-gray-200" href="about.html">About</a>
+        <a class="nav-link text-green-400 font-semibold" href="contact.html">Contact</a>
+      </div>
+      <button id="menuBtn" class="md:hidden text-gray-200 text-2xl hover:text-green-300 transition">☰</button>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden bg-black/90 px-6 pb-3">
+      <div class="flex flex-col gap-3">
+        <a class="nav-link text-gray-200" href="index.html">Home</a>
+        <a class="nav-link text-gray-200" href="#">Detection</a>
+        <a class="nav-link text-gray-200" href="#">Statistics</a>
+        <a class="nav-link text-gray-200" href="#">About</a>
+        <a class="nav-link text-green-400 font-semibold" href="contact.html">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contact Content -->
+  <main class="flex-1 overflow-y-auto pt-24 px-6">
+    <div class="max-w-4xl mx-auto bg-neutral-900/80 rounded-2xl shadow-lg p-8 md:p-12">
+      <h1 class="text-4xl font-bold text-green-400 mb-4 text-center opacity-0" id="contact-title">Contact Us</h1>
+      <p class="text-gray-300 text-center mb-8 opacity-0" id="contact-subtitle">
+        Have questions, feedback, or collaboration ideas? Reach out to the LeafGuard team.
+      </p>
+
+      <form class="space-y-6">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-300">Your Name</label>
+          <input type="text" id="name" class="mt-1 block w-full rounded-md bg-neutral-800 border border-gray-700 text-gray-200 focus:ring-green-400 focus:border-green-400 px-4 py-2" placeholder="Enter your name" required />
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-300">Email Address</label>
+          <input type="email" id="email" class="mt-1 block w-full rounded-md bg-neutral-800 border border-gray-700 text-gray-200 focus:ring-green-400 focus:border-green-400 px-4 py-2" placeholder="Enter your email" required />
+        </div>
+        <div>
+          <label for="message" class="block text-sm font-medium text-gray-300">Message</label>
+          <textarea id="message" rows="5" class="mt-1 block w-full rounded-md bg-neutral-800 border border-gray-700 text-gray-200 focus:ring-green-400 focus:border-green-400 px-4 py-2" placeholder="Write your message here..." required></textarea>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow-md transition">
+            Send Message
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-black/70 text-gray-500 text-center py-2 text-xs border-t border-gray-800 mt-8">
+    &copy; 2025 LeafGuard • Built by Group 4
+  </footer>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Mobile menu toggle
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    if (menuBtn) menuBtn.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+
+    // Entrance animations
+    anime({ targets: "#logo", translateX: [-24,0], opacity:[0,1], duration:800, easing:"easeOutExpo" });
+    anime({ targets: "#contact-title", translateY: [-16,0], opacity:[0,1], delay:150, duration:1000, easing:"easeOutExpo" });
+    anime({ targets: "#contact-subtitle", translateY: [-8,0], opacity:[0,1], delay:350, duration:900, easing:"easeOutExpo" });
+
+    // Particle background
+    const bg = document.getElementById("bg-canvas");
+    const g = bg.getContext("2d");
+
+    function sizeCanvas() {
+      bg.width = window.innerWidth;
+      bg.height = window.innerHeight;
+    }
+    sizeCanvas();
+    window.addEventListener("resize", sizeCanvas);
+
+    const particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * innerWidth,
+      y: Math.random() * innerHeight,
+      r: Math.random() * 2.2 + 1,
+      dx: (Math.random() - 0.5) * 0.6,
+      dy: (Math.random() - 0.5) * 0.6,
+      a: Math.random() * 0.5 + 0.25
+    }));
+
+    function draw() {
+      g.clearRect(0, 0, bg.width, bg.height);
+      particles.forEach(p => {
+        g.beginPath();
+        g.fillStyle = `rgba(134,239,172,${p.a})`;
+        g.shadowColor = "rgba(134,239,172,0.9)";
+        g.shadowBlur = 8;
+        g.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        g.fill();
+        p.x += p.dx; p.y += p.dy;
+        if (p.x < 0 || p.x > bg.width) p.dx *= -1;
+        if (p.y < 0 || p.y > bg.height) p.dy *= -1;
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  });
+  </script>
+</body>
+</html>

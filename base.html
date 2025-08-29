@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}LeafGuard{% endblock %}</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Anime.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <!-- Chart.js (optional, only needed for pages with charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
+</head>
+
+<body class="h-screen overflow-hidden text-gray-200 font-sans flex flex-col">
+
+  <!-- Animated background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 bg-black/60 backdrop-blur-md z-50 shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+      <a href="{{ url_for('index') }}" class="text-2xl font-bold tracking-wide text-white" id="logo">
+        LeafGuard 🌿
+      </a>
+      <div class="hidden md:flex items-center gap-6">
+        <a class="nav-link text-gray-200" href="{{ url_for('index') }}">Home</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('detection') }}">Detection</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('statistics') }}">Statistics</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('about') }}">About</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('contact') }}">Contact</a>
+      </div>
+      <button id="menuBtn" class="md:hidden text-gray-200 text-2xl hover:text-green-300 transition">☰</button>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden bg-black/90 px-6 pb-3">
+      <div class="flex flex-col gap-3">
+        <a class="nav-link text-gray-200" href="{{ url_for('index') }}">Home</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('detection') }}">Detection</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('statistics') }}">Statistics</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('about') }}">About</a>
+        <a class="nav-link text-gray-200" href="{{ url_for('contact') }}">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main page content -->
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer class="bg-black/70 text-gray-500 text-center py-2 text-xs border-t border-gray-800">
+    &copy; 2025 LeafGuard • Built by Group 4
+  </footer>
+
+  <!-- Animation + Particles Script -->
+  <script src="{{ url_for('static', filename='new.script.js') }}"></script>
+</body>
+</html>
